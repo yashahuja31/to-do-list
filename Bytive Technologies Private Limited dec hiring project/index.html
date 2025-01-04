@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+    }
+    .task {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .task-actions button {
+      margin-left: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>To-Do List</h1>
+  
+  <!-- form to input data -->
+  <form id="taskForm">
+    <input type="text" id="title" placeholder="Task Title" required>
+    <input type="text" id="description" placeholder="Task Description" required>
+    <button type="submit">Add Task</button>
+  </form>
+
+  <!-- task list -->
+  <div id="tasksContainer"></div>
+
+  <script>
+    const API_BASE = "http://localhost:3000/tasks"; // api base to load data from
+
+    // func to display all tasks
+    async function fetchTasks() {
+      const response = await fetch(API_BASE);
+      const tasks = await response.json();
+      
+      const tasksContainer = document.getElementById("tasksContainer");
+      tasksContainer.innerHTML = ""; //to clear current tasks
+
+      tasks.forEach(task => {
+        const taskDiv = document.createElement("div");
+        taskDiv.classList.add("task");
+
+        taskDiv.innerHTML = `
+          <div>
+            <h3>${task.title}</h3>
+            <p>${task.description}</p>
+            <p><strong>Status:</strong> ${task.status}</p>
+          </div>
+          <div class="task-actions">
+            <button onclick="updateTask(${task.id}, 'in-progress')">In-Progress</button>
+            <button onclick="updateTask(${task.id}, 'completed')">Completed</button>
+            <button onclick="deleteTask(${task.id})">Delete</button>
+          </div>
+        `;
+
+        tasksContainer.appendChild(taskDiv);
+      });
+    }
+
+    // func to add new task
+    document.getElementById("taskForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const title = document.getElementById("title").value;
+      const description = document.getElementById("description").value;
+
+      const response = await fetch(API_BASE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title, description }),
+      });
+
+      if (response.ok) {
+        alert("Task added successfully!");
+        fetchTasks(); // to refresh tasks
+      } else {
+        alert("Failed to add task");
+      }
+    });
+
+    // func to update task status
+    async function updateTask(id, status) {
+      const response = await fetch(`${API_BASE}/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status }),
+      });
+
+      if (response.ok) {
+        alert("Task updated successfully!");
+        fetchTasks();
+      } else {
+        alert("Failed to update task");
+      }
+    }
+
+    // func to delete a task
+    async function deleteTask(id) {
+      const response = await fetch(`${API_BASE}/${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        alert("Task deleted successfully!");
+        fetchTasks(); 
+      } else {
+        alert("Failed to delete task");
+      }
+    }
+
+    // func to load initial tasks
+    fetchTasks();
+  </script>
+</body>
+</html>
