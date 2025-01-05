@@ -19,3 +19,4 @@ now the steps to run the project are as follows:
 4. now press the go-live of the code editor you are using (for me I'm using vs code so the go live button is in the bottom right corner of my code editor)
 5. a new tab will open in your browser with 2 input data elements and a button which is used to add data in the JSON file created by the name 'tasks.json'
 
+this to do list allows you to create a private to-do for yourself which you can access only after you log in with you credentials with the help of this privacy of your data is constantly maintained, JWT (jsonwebtokens) help ensuring the privayc of your data by binding it with your login credentials 
